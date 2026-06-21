@@ -1,0 +1,19 @@
+spring:
+  datasource-common:
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  hikari:
+    connection-timeout: 120000
+    maximum-pool-size: 500
+    idle-timeout: 5000
+    max-lifetime: 1800000
+    pool-name: DatabaseCommon
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource-common:
+    url: jdbc:mysql://localhost:3306/ems_dev?autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true&characterEncoding=UTF-8
+    username: root
+    password: Hieu@123
