@@ -1,8 +1,19 @@
 package com.ems.uetrace.service;
 
+import com.ems.uetrace.config.KafkaProducerProperties;
+import com.ems.uetrace.contains.SystemType;
+import com.ems.uetrace.model.NeConfig;
+import com.ems.uetrace.model.StreamRecord;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.BinaryEncoder;
+import org.apache.avro.io.EncoderFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -65,10 +76,10 @@ public class AvroSerializer {
 
     private volatile Map<SystemType, SystemCtx> ctxBySystem;
     // Parsed from comma-separated config; tried left-to-right for HA cluster.
-    private final List<String> schemaRegistryUrls;
+    private List<String> schemaRegistryUrls;
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    public AvroStreamSerializer(KafkaProducerProperties props, NeConfig neConfig) {
+    public void AvroStreamSerializer(KafkaProducerProperties props, NeConfig neConfig) {
         this.schemaRegistryUrls = Arrays.stream(props.getSchemaRegistryUrl().split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
@@ -392,7 +403,7 @@ public class AvroSerializer {
                              SystemCtx ctx,
                              StreamRecord r) {
 
-        rec.put(0, r.getNetId());
+        rec.put(0, r.getNeId());
         rec.put(1, r.getRecordTime());
         rec.put(2, r.getDuration());
         rec.put(3, r.getLocation());
